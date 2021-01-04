@@ -98,4 +98,4 @@ If you want to use render targets to generate the landscape at runtime you'll ne
 Geotiff heightmap assets contain the geo information and a texture2D where the 16 bit height values are split into the red and green channel of the texture. Because .tif files can also be imported as Texture without the geo reference information it is important to select the file type "Geotiff File (.tif)" when importing an asset into the content browser otherwise the pure texture import will be auto-selected.
 
 ### S2GLC Weightmap DataAsset
-S2GLC DataAssets contain a texture for each of the 15 layers (*except NoData and Clouds*) and the geo information.
+S2GLC DataAssets contain a texture for each of the 15 layers (*except NoData and Clouds*) and the geo reference information.

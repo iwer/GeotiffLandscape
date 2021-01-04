@@ -5,6 +5,7 @@
 #include "HAL/UnrealMemory.h"
 #include "GeotiffRasterScaler.h"
 #include "GeotiffColorHelper.h"
+#include "GeoReferenceHelper.h"
 #include "S2GLCClasses.h"
 
 #define LOCTEXT_NAMESPACE "LandscapeEditor.NewLandscape"
@@ -60,14 +61,14 @@ FLandscapeWeightmapInfo FLandscapeWeightmapFileFormat_S2GLC::Validate(const TCHA
                             Result.ResultCode = ELandscapeImportResult::Error;
                         } else {
                             auto srs = gdaldata->GetProjectionRef();
-                            if(!FGeoReference::IsWGS84(OSRNewSpatialReference(srs)) &&
-                               !FGeoReference::IsUTM(OSRNewSpatialReference(srs))){
+                            if(!FGeoReferenceHelper::IsWGS84(OSRNewSpatialReference(srs)) &&
+                               !FGeoReferenceHelper::IsUTM(OSRNewSpatialReference(srs))){
                                 // not in wgs 84 coordinate system
                                 Result.ErrorMessage = LOCTEXT("FileFormatS2GLC_SpatialReferenceError","Spatial Reference not supported!");
                                 Result.ResultCode = ELandscapeImportResult::Error;
                             } else {
                                 double width, height;
-                                FGeoReference::GetSize(gdaldata, width, height);
+                                URegionOfInterest::GetSize(gdaldata, width, height);
                                 FLandscapeFileResolution ImportResolution;
                                 ImportResolution.Width = width;
                                 ImportResolution.Height = height;

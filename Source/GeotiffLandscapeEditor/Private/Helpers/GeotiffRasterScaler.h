@@ -66,6 +66,17 @@ public:
         return true;
     }
 
+    static double HeightScaleFactor(double maxHeight, double minHeight)
+    {
+        // check if height difference is bigger than UE4 landscape height limit
+        double heightdiff = maxHeight - minHeight;
+        if(heightdiff > UE4LANDSCAPE_HEIGHTLIMIT) {
+            return heightdiff / UE4LANDSCAPE_HEIGHTLIMIT;
+        } else {
+            return 1.0;
+        }
+    }
+
 private:
     static float BilinearInterpolation(float A,
                                        float B,
@@ -94,10 +105,6 @@ private:
         ScaleSuggestion = HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
 
         UE_LOG(LogTemp,Warning,TEXT("ScaleSuggestion: %f, min: %f, max: %f"), ScaleSuggestion, rasterMinMax->Min, rasterMinMax->Max);
-
-        // auto rasterBands = mergetiff::DatasetManagement::getRasterBands(source, {static_cast<unsigned int>(bandIndex)});
-
-
 
         auto rasterdata = mergetiff::DatasetManagement::rasterFromDataset<PixelType>(source,{static_cast<unsigned int>(bandIndex)});
 
@@ -194,17 +201,6 @@ private:
 					targetPixels.Add(255);
 				}
             }
-        }
-    }
-
-    static double HeightScaleFactor(double maxHeight, double minHeight)
-    {
-        // check if height difference is bigger than UE4 landscape height limit
-        double heightdiff = maxHeight - minHeight;
-        if(heightdiff > UE4LANDSCAPE_HEIGHTLIMIT) {
-            return heightdiff / UE4LANDSCAPE_HEIGHTLIMIT;
-        } else {
-            return 1.0;
         }
     }
 
