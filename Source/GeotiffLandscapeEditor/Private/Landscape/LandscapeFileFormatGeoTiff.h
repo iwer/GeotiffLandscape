@@ -12,8 +12,6 @@ class FLandscapeHeightmapFileFormat_Geotiff : public ILandscapeHeightmapFileForm
 {
 private:
         FLandscapeFileTypeInfo FileTypeInfo;
-
-        FVector2D PredictLandscapeSize(int width, int height) const;
 public:
         FLandscapeHeightmapFileFormat_Geotiff();
 

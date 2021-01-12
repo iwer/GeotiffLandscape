@@ -97,16 +97,6 @@ FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(cons
             if(strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Int16", 6) == 0) {
                 double heightscale;
                 UGeotiffRasterScaler::ConvertScaleGeotiffRaster<int16_t>(EPixelScanMode::G16_RG8, gdaldata, 1, TempData, ExpectedResolution.Width, ExpectedResolution.Height, heightscale);
-
-
-                // auto PredMapSize = PredictLandscapeSize(ExpectedResolution.Width, ExpectedResolution.Height);
-                // Result.ResultCode = ELandscapeImportResult::Warning;
-                // Result.ErrorMessage = FText::Format(LOCTEXT("FileFormatGeotiff_ImportLargeHeight", "The needs to be scaled for correct sizing: X:{0} Y:{1} Z:{2}"),
-                //                         ExpectedResolution.Width / PredMapSize.X * 100,
-                //                         ExpectedResolution.Height / PredMapSize.Y * 100,
-                //                         heightscale*100);
-
-
                 Result.Data.Empty(ExpectedResolution.Width * ExpectedResolution.Height);
                 Result.Data.AddUninitialized(ExpectedResolution.Width * ExpectedResolution.Height);
                 FMemory::Memcpy(Result.Data.GetData(), TempData.GetData(), ExpectedResolution.Width * ExpectedResolution.Height * 2);
@@ -114,15 +104,6 @@ FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(cons
 			else if (strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Float32", 8) == 0) {
 				double heightscale;
 				UGeotiffRasterScaler::ConvertScaleGeotiffRaster<float>(EPixelScanMode::F32_RG8, gdaldata, 1, TempData, ExpectedResolution.Width, ExpectedResolution.Height, heightscale);
-
-
-                // auto PredMapSize = PredictLandscapeSize(ExpectedResolution.Width, ExpectedResolution.Height);
-                // Result.ResultCode = ELandscapeImportResult::Warning;
-                // Result.ErrorMessage = FText::Format(LOCTEXT("FileFormatGeotiff_ImportLargeHeight", "The needs to be scaled for correct sizing: X:{0} Y:{1} Z:{2}"),
-                //                         ExpectedResolution.Width / PredMapSize.X * 100,
-                //                         ExpectedResolution.Height / PredMapSize.Y * 100,
-                //                         heightscale*100);
-
 				Result.Data.Empty(ExpectedResolution.Width * ExpectedResolution.Height);
 				Result.Data.AddUninitialized(ExpectedResolution.Width * ExpectedResolution.Height);
 				FMemory::Memcpy(Result.Data.GetData(), TempData.GetData(), ExpectedResolution.Width * ExpectedResolution.Height * 2);
@@ -137,97 +118,6 @@ void FLandscapeHeightmapFileFormat_Geotiff::Export(const TCHAR* HeightmapFilenam
 
 }
 
-/**
-* From Editor/LandscapeEditor/Private/NewLandscapeUtils.cpp
-*/
-FVector2D FLandscapeHeightmapFileFormat_Geotiff::PredictLandscapeSize(int width, int height) const
-{
-    int32 SectionSizes[6] = { 7, 15, 31, 63, 127, 255 };
-    int32 NumSections[2] = { 1, 2 };
-
-    int32 Width = width;
-    int32 Height = height;
-
-    int32 QuadsPerSection = 0;
-    int32 SectionsPerComponent = 0;
-    int32 ComponentCountX = 0;
-    int32 ComponentCountY = 0;
-
-    bool bFoundMatch = false;
-    if(Width > 0 && Height > 0)
-    {
-        // Try to find a section size and number of sections that exactly matches the dimensions of the heightfield
-        for(int32 SectionSizesIdx = UE_ARRAY_COUNT(SectionSizes) - 1; SectionSizesIdx >= 0; SectionSizesIdx--)
-        {
-            for(int32 NumSectionsIdx = UE_ARRAY_COUNT(NumSections) - 1; NumSectionsIdx >= 0; NumSectionsIdx--)
-            {
-                int32 ss = SectionSizes[SectionSizesIdx];
-                int32 ns = NumSections[NumSectionsIdx];
-
-                if(((Width - 1) % (ss * ns)) == 0 && ((Width - 1) / (ss * ns)) <= 32 &&
-                        ((Height - 1) % (ss * ns)) == 0 && ((Height - 1) / (ss * ns)) <= 32)
-                {
-                    bFoundMatch = true;
-                    QuadsPerSection = ss;
-                    SectionsPerComponent = ns;
-                    ComponentCountX = (Width - 1) / (ss * ns);
-                    ComponentCountY = (Height - 1) / (ss * ns);
-
-                    break;
-                }
-            }
-            if(bFoundMatch)
-            {
-                break;
-            }
-        }
-
-        if(!bFoundMatch)
-        {
-            // if there was no exact match, try increasing the section size until we encompass the whole heightmap
-            const int32 CurrentSectionSize = QuadsPerSection;
-            const int32 CurrentNumSections = SectionsPerComponent;
-            for(int32 SectionSizesIdx = 0; SectionSizesIdx < UE_ARRAY_COUNT(SectionSizes); SectionSizesIdx++)
-            {
-                if(SectionSizes[SectionSizesIdx] < CurrentSectionSize)
-                {
-                    continue;
-                }
-
-                const int32 ComponentsX = FMath::DivideAndRoundUp((Width - 1), SectionSizes[SectionSizesIdx] * CurrentNumSections);
-                const int32 ComponentsY = FMath::DivideAndRoundUp((Height - 1), SectionSizes[SectionSizesIdx] * CurrentNumSections);
-                if(ComponentsX <= 32 && ComponentsY <= 32)
-                {
-                    bFoundMatch = true;
-                    QuadsPerSection = SectionSizes[SectionSizesIdx];
-                    //UISettings->NewLandscape_SectionsPerComponent = ;
-                    ComponentCountX = ComponentsX;
-                    ComponentCountY = ComponentsY;
-
-                    break;
-                }
-            }
-        }
-
-        if(!bFoundMatch)
-        {
-            // if the heightmap is very large, fall back to using the largest values we support
-            const int32 MaxSectionSize = SectionSizes[UE_ARRAY_COUNT(SectionSizes) - 1];
-            const int32 MaxNumSubSections = NumSections[UE_ARRAY_COUNT(NumSections) - 1];
-            const int32 ComponentsX = FMath::DivideAndRoundUp((Width - 1), MaxSectionSize * MaxNumSubSections);
-            const int32 ComponentsY = FMath::DivideAndRoundUp((Height - 1), MaxSectionSize * MaxNumSubSections);
-
-            bFoundMatch = true;
-            QuadsPerSection = MaxSectionSize;
-            SectionsPerComponent = MaxNumSubSections;
-            ComponentCountX = ComponentsX;
-            ComponentCountY = ComponentsY;
-
-        }
-    }
-    return FVector2D(QuadsPerSection*SectionsPerComponent*ComponentCountX, QuadsPerSection*SectionsPerComponent*ComponentCountY);
-
-}
 //////////////////////////////////////////////////////////////////////////
 
 FLandscapeWeightmapFileFormat_Geotiff::FLandscapeWeightmapFileFormat_Geotiff()
