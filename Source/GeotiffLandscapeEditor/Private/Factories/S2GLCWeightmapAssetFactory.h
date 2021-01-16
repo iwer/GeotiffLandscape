@@ -13,7 +13,7 @@ class US2GLCWeightmapAssetFactory
     GENERATED_BODY()
 public:
     US2GLCWeightmapAssetFactory(const FObjectInitializer& ObjectInitializer);
-	virtual UObject* FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled) override;
+    virtual UObject* FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled) override;
     virtual bool FactoryCanImport(const FString & Filename) override;
 private:
     void ExtractLayerMap(GDALDatasetRef &Source, UTexture2D * TargetTexture, FName LayerName, TArray<uint8> Pixels, int Width, int Height);

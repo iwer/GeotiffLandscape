@@ -17,32 +17,32 @@
  * Implements the visual style of the text asset editor UI.
  */
 class FGeotiffHeightmapAssetEditorStyle
-	: public FSlateStyleSet
+    : public FSlateStyleSet
 {
 public:
 
-	/** Default constructor. */
-	 FGeotiffHeightmapAssetEditorStyle()
-		 : FSlateStyleSet("GeotiffHeightmapAssetEditorStyle")
-	 {
-		const FVector2D Icon16x16(16.0f, 16.0f);
-		const FVector2D Icon20x20(20.0f, 20.0f);
-		const FVector2D Icon40x40(40.0f, 40.0f);
+    /** Default constructor. */
+     FGeotiffHeightmapAssetEditorStyle()
+         : FSlateStyleSet("GeotiffHeightmapAssetEditorStyle")
+     {
+        const FVector2D Icon16x16(16.0f, 16.0f);
+        const FVector2D Icon20x20(20.0f, 20.0f);
+        const FVector2D Icon40x40(40.0f, 40.0f);
 
-		const FString BaseDir = IPluginManager::Get().FindPlugin("GeotiffLandscape")->GetBaseDir();
-		SetContentRoot(BaseDir / TEXT("Content"));
+        const FString BaseDir = IPluginManager::Get().FindPlugin("GeotiffLandscape")->GetBaseDir();
+        SetContentRoot(BaseDir / TEXT("Content"));
 
-		// set new styles here, for example...
-		//Set("TextAssetEditor.FancyButton", new IMAGE_BRUSH("icon_forward_40x", Icon40x40));
+        // set new styles here, for example...
+        //Set("TextAssetEditor.FancyButton", new IMAGE_BRUSH("icon_forward_40x", Icon40x40));
 
-		FSlateStyleRegistry::RegisterSlateStyle(*this);
-	 }
+        FSlateStyleRegistry::RegisterSlateStyle(*this);
+     }
 
-	 /** Destructor. */
-	 ~FGeotiffHeightmapAssetEditorStyle()
-	 {
-		FSlateStyleRegistry::UnRegisterSlateStyle(*this);
-	 }
+     /** Destructor. */
+     ~FGeotiffHeightmapAssetEditorStyle()
+     {
+        FSlateStyleRegistry::UnRegisterSlateStyle(*this);
+     }
 };
 
 

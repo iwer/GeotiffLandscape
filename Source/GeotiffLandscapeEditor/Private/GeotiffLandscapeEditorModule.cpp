@@ -2,6 +2,7 @@
 #include "Modules/ModuleManager.h"
 #include "Toolkits/AssetEditorToolkit.h"
 #include "LandscapeEditorModule.h"
+#include "UnrealGDAL.h"
 
 #include "AssetTools/GeotiffHeightmapAssetActions.h"
 #include "AssetTools/S2GLCWeightmapAssetActions.h"
@@ -15,25 +16,28 @@ class FGeotiffLandscapeEditorModule : public IModuleInterface
 {
 public:
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override
-	{
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override
+    {
+        FUnrealGDALModule* UnrealGDAL = FModuleManager::Get().LoadModulePtr<FUnrealGDALModule>("UnrealGDAL");
+        UnrealGDAL->InitGDAL();
+
         Style = MakeShareable(new FGeotiffHeightmapAssetEditorStyle());
 
-		RegisterAssetTools();
+        RegisterAssetTools();
         RegisterLandscapeFileFormats();
     }
 
-	virtual void ShutdownModule() override
-	{
+    virtual void ShutdownModule() override
+    {
         UnregisterAssetTools();
         //UnregisterLandscapeFileFormats();
-	}
+    }
 
     virtual bool SupportsDynamicReloading() override
-	{
-		return true;
-	}
+    {
+        return true;
+    }
 protected:
     /** Registers asset tool actions. */
     void RegisterAssetTools()
@@ -47,32 +51,32 @@ protected:
     }
 
     /**
-	 * Registers a single asset type action.
-	 *
-	 * @param AssetTools The asset tools object to register with.
-	 * @param Action The asset type action to register.
-	 */
-	void RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
-	{
-		AssetTools.RegisterAssetTypeActions(Action);
-		RegisteredAssetTypeActions.Add(Action);
-	}
+     * Registers a single asset type action.
+     *
+     * @param AssetTools The asset tools object to register with.
+     * @param Action The asset type action to register.
+     */
+    void RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
+    {
+        AssetTools.RegisterAssetTypeActions(Action);
+        RegisteredAssetTypeActions.Add(Action);
+    }
 
     /** Unregisters asset tool actions. */
-	void UnregisterAssetTools()
-	{
-		FAssetToolsModule* AssetToolsModule = FModuleManager::GetModulePtr<FAssetToolsModule>("AssetTools");
+    void UnregisterAssetTools()
+    {
+        FAssetToolsModule* AssetToolsModule = FModuleManager::GetModulePtr<FAssetToolsModule>("AssetTools");
 
-		if (AssetToolsModule)
-		{
-			IAssetTools& AssetTools = AssetToolsModule->Get();
+        if (AssetToolsModule)
+        {
+            IAssetTools& AssetTools = AssetToolsModule->Get();
 
-			for (auto Action : RegisteredAssetTypeActions)
-			{
-				AssetTools.UnregisterAssetTypeActions(Action);
-			}
-		}
-	}
+            for (auto Action : RegisteredAssetTypeActions)
+            {
+                AssetTools.UnregisterAssetTypeActions(Action);
+            }
+        }
+    }
 
     void RegisterLandscapeFileFormats()
     {

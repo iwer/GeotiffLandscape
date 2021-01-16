@@ -13,8 +13,8 @@ enum EPixelScanMode {
     G8_G8,          // 8bit grayscale as in source (without interpolation)
     G16_RG8,        // 16bit grayscale to two 8bits
     G16_BGRA8,      // 16bit grayscale to 8bit BGRA (B=0 G=LSB R=MSB A=1)
-	F32_RG8,		// 32bit float to two 8bits
-	F32_BGRA8		// 32bit float to  8bit BGRA (B=0 G=LSB R=MSB A=1)
+    F32_RG8,		// 32bit float to two 8bits
+    F32_BGRA8		// 32bit float to  8bit BGRA (B=0 G=LSB R=MSB A=1)
 };
 
 UCLASS()
@@ -187,19 +187,19 @@ private:
                     targetPixels.Add(gleft);
                     targetPixels.Add(255);
                 } else if (psm == EPixelScanMode::F32_BGRA8) {
-					float gray = BilinearInterpolation(A, B, C, D, x_diff, y_diff);
-					// scale to min height and max height
-					uint16 igray = (gray - rasterMinMax->Min) / (rasterMinMax->Max - rasterMinMax->Min) * 65535;
+                    float gray = BilinearInterpolation(A, B, C, D, x_diff, y_diff);
+                    // scale to min height and max height
+                    uint16 igray = (gray - rasterMinMax->Min) / (rasterMinMax->Max - rasterMinMax->Min) * 65535;
 
-					// split to two 8bits
-					uint8 gright = igray & 0xff;
-					uint8 gleft = (igray >> 8);
+                    // split to two 8bits
+                    uint8 gright = igray & 0xff;
+                    uint8 gleft = (igray >> 8);
 
-					targetPixels.Add(0);
-					targetPixels.Add(gright);
-					targetPixels.Add(gleft);
-					targetPixels.Add(255);
-				}
+                    targetPixels.Add(0);
+                    targetPixels.Add(gright);
+                    targetPixels.Add(gleft);
+                    targetPixels.Add(255);
+                }
             }
         }
     }

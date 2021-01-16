@@ -2,6 +2,22 @@ GeotiffLandscape - UE4 Plugin
 ==============================
 Adds geotiff files as UE4 Landscape height/weight map file type and custom data asset type. This can be used to generate real scale UE4 maps from existing locations. Geotiff digital elevation models (DEM) contain information about geo coordinates of the map and information about maximum and minimum elevation. With this information 1:1 scale Landscapes can be created using this Plugin. Also geotiff land cover files from the [S2GLC](http://s2glc.cbk.waw.pl/) can be imported to named landscape layers.
 
+
+
+- [Features](#features)
+- [Cutbacks](#cutbacks)
+- [Building](#building)
+- [Usage](#usage)
+- [Landscape import](#landscape-import)
+    - [Landscape Heightmap import](#landscape-heightmap-import)
+    - [Landscape Weightmap import](#landscape-weightmap-import)
+        - [Single layer weightmap](#single-layer-weightmap)
+        - [Multi layer weightmap](#multi-layer-weightmap)
+- [DataAssets](#dataassets)
+    - [Geotiff Heightmap DataAsset](#geotiff-heightmap-dataasset)
+    - [S2GLC Weightmap DataAsset](#s2glc-weightmap-dataasset)
+
+
 ## Features
 * Landscape Heightmap Fileformat Geotiff
 * Landscape Weightmap Fileformat Geotiff
@@ -56,7 +72,7 @@ PublicDependencyModuleNames.AddRange(
 ## Landscape import
 
 ### Landscape Heightmap import
-In Landscape mode when importing a heightmap you will notice a new filetype "DEM Heightmap .tif files". Several checks are performed to ensure the file can be imported. Currently only geotiff with WGS84 or UTM geo reference containing a single Int16 rasterband layer of gray-scale values in meters are tested but other types may just work or require little adaptation of the import code.
+In Landscape mode when importing a heightmap you will notice a new filetype "DEM Heightmap .tif files". Several checks are performed to ensure the file can be imported. In theory all projected geo coordinate systems with coordinates in meter containing a single Int16 or Float32 rasterband layer of gray-scale values in meters should work fine. Although it really does not make much sense to generate a landscape from a spherical projection it is also possible to import WGS48 references heightmaps. This can be usefull when geographic accuracy is not that important to avoid the effort of converting material.
 
 ### Landscape Weightmap import
 

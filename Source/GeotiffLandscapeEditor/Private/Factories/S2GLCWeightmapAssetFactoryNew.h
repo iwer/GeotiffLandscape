@@ -14,5 +14,5 @@ class US2GLCWeightmapAssetFactoryNew
 public:
     US2GLCWeightmapAssetFactoryNew(const FObjectInitializer& ObjectInitializer);
     virtual UObject* FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
-	virtual bool ShouldShowInNewMenu() const override;
+    virtual bool ShouldShowInNewMenu() const override;
 };

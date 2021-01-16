@@ -8,62 +8,62 @@
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
 
 FGeotiffHeightmapAssetActions::FGeotiffHeightmapAssetActions(const TSharedRef<ISlateStyle>& InStyle)
-	: Style(InStyle)
+    : Style(InStyle)
 {}
 
 bool FGeotiffHeightmapAssetActions::CanFilter()
 {
-	return true;
+    return true;
 }
 
 void FGeotiffHeightmapAssetActions::GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder)
 {
-	FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
+    FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
 
-	auto TextAssets = GetTypedWeakObjectPtrs<UGeotiffHeightmapAsset>(InObjects);
+    auto TextAssets = GetTypedWeakObjectPtrs<UGeotiffHeightmapAsset>(InObjects);
 
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("GeotiffHeightmapAsset_DummyText", "Dummy Text"),
-		LOCTEXT("GeotiffHeightmapAsset_DummyTextToolTip", "Dummy menu entry."),
-		FSlateIcon(),
-		FUIAction(
-			FExecuteAction::CreateLambda([=]{
+    MenuBuilder.AddMenuEntry(
+        LOCTEXT("GeotiffHeightmapAsset_DummyText", "Dummy Text"),
+        LOCTEXT("GeotiffHeightmapAsset_DummyTextToolTip", "Dummy menu entry."),
+        FSlateIcon(),
+        FUIAction(
+            FExecuteAction::CreateLambda([=]{
 
-			}),
-			FCanExecuteAction::CreateLambda([=] {
-				return false;
-			})
-		)
-	);
+            }),
+            FCanExecuteAction::CreateLambda([=] {
+                return false;
+            })
+        )
+    );
 }
 
 uint32 FGeotiffHeightmapAssetActions::GetCategories()
 {
-	return EAssetTypeCategories::MaterialsAndTextures;
+    return EAssetTypeCategories::MaterialsAndTextures;
 }
 
 
 FText FGeotiffHeightmapAssetActions::GetName() const
 {
-	return NSLOCTEXT("AssetTypeActions", "AssetTypeActions_GeotiffHeightmapAsset", "Geotiff Heightmap Asset");
+    return NSLOCTEXT("AssetTypeActions", "AssetTypeActions_GeotiffHeightmapAsset", "Geotiff Heightmap Asset");
 }
 
 
 UClass* FGeotiffHeightmapAssetActions::GetSupportedClass() const
 {
-	return UGeotiffHeightmapAsset::StaticClass();
+    return UGeotiffHeightmapAsset::StaticClass();
 }
 
 
 FColor FGeotiffHeightmapAssetActions::GetTypeColor() const
 {
-	return FColor::Red;
+    return FColor::Red;
 }
 
 
 bool FGeotiffHeightmapAssetActions::HasActions(const TArray<UObject*>& InObjects) const
 {
-	return true;
+    return true;
 }
 
 

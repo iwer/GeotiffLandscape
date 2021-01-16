@@ -5,11 +5,11 @@
 #include "AssetRegistryModule.h"
 
 UGeotiffHeightmapAssetFactory::UGeotiffHeightmapAssetFactory( const FObjectInitializer& ObjectInitializer )
-	: Super(ObjectInitializer)
+    : Super(ObjectInitializer)
 {
-	SupportedClass = UGeotiffHeightmapAsset::StaticClass();
-	bCreateNew = false;
-	bEditorImport = true;
+    SupportedClass = UGeotiffHeightmapAsset::StaticClass();
+    bCreateNew = false;
+    bEditorImport = true;
     Formats.Add(TEXT("tif;Geotiff Heightmap File"));
 }
 
@@ -22,7 +22,7 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
                                                           FFeedbackContext* Warn,
                                                           bool& bOutOperationCanceled)
 {
-	UGeotiffHeightmapAsset* Asset = NewObject<UGeotiffHeightmapAsset>(InParent, InClass, InName, Flags);
+    UGeotiffHeightmapAsset* Asset = NewObject<UGeotiffHeightmapAsset>(InParent, InClass, InName, Flags);
 
     // open file
     GDALDatasetRef gdaldata = GDALHelpers::OpenRaster(Filename, true);
@@ -39,9 +39,9 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
     Asset->MinHeight = band->GetMinimum();
     Asset->MaxHeight = band->GetMaximum();
 
-	Asset->ROI = NewObject<URegionOfInterest>(Asset);
-	Asset->ROI->InitFromGDAL(gdaldata);
-	
+    Asset->ROI = NewObject<URegionOfInterest>(Asset);
+    Asset->ROI->InitFromGDAL(gdaldata);
+
     int texsize = 2048;
     FString TextureName = TEXT("T_") + InName.ToString();
 
@@ -57,13 +57,13 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
     TArray<uint8> targetPixels;
     double ScaleSuggestion;
 
-	auto datatype = band->GetRasterDataType();
-	if (datatype == GDT_Int16) {
-		UGeotiffRasterScaler::ConvertScaleGeotiffRaster<int16_t>(EPixelScanMode::G16_BGRA8, gdaldata, 1, targetPixels, texsize, texsize, ScaleSuggestion);
-	}
-	else if (datatype == GDT_Float32) {
-		UGeotiffRasterScaler::ConvertScaleGeotiffRaster<float>(EPixelScanMode::F32_BGRA8, gdaldata, 1, targetPixels, texsize, texsize, ScaleSuggestion);
-	}
+    auto datatype = band->GetRasterDataType();
+    if (datatype == GDT_Int16) {
+        UGeotiffRasterScaler::ConvertScaleGeotiffRaster<int16_t>(EPixelScanMode::G16_BGRA8, gdaldata, 1, targetPixels, texsize, texsize, ScaleSuggestion);
+    }
+    else if (datatype == GDT_Float32) {
+        UGeotiffRasterScaler::ConvertScaleGeotiffRaster<float>(EPixelScanMode::F32_BGRA8, gdaldata, 1, targetPixels, texsize, texsize, ScaleSuggestion);
+    }
 
     FTexture2DMipMap* Mip = new FTexture2DMipMap();
     Asset->Texture->PlatformData->Mips.Add(Mip);
@@ -81,10 +81,10 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
 
     Asset->MarkPackageDirty();
 
-	bOutOperationCanceled = false;
+    bOutOperationCanceled = false;
 
 
-	return Asset;
+    return Asset;
 }
 
 bool UGeotiffHeightmapAssetFactory::FactoryCanImport(const FString & Filename)

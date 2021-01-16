@@ -24,6 +24,6 @@ public:
     float MaxHeight;
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="GeotiffHeightmapAsset")
     UTexture2D * Texture;
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GeotiffHeightmapAsset")
-	URegionOfInterest * ROI;
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GeotiffHeightmapAsset")
+    URegionOfInterest * ROI;
 };

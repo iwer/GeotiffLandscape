@@ -10,14 +10,14 @@ class FGeotiffLandscapeModule : public IModuleInterface
 {
 public:
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override
     {
         // Init GDAL module
         FUnrealGDALModule* UnrealGDAL = FModuleManager::Get().LoadModulePtr<FUnrealGDALModule>("UnrealGDAL");
         UnrealGDAL->InitGDAL();
     }
-	virtual void ShutdownModule() override
+    virtual void ShutdownModule() override
     {}
 
     virtual bool SupportsDynamicReloading() override

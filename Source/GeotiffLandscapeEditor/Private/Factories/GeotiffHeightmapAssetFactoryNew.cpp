@@ -4,21 +4,21 @@
 #include "GeotiffHeightmapAsset.h"
 
 UGeotiffHeightmapAssetFactoryNew::UGeotiffHeightmapAssetFactoryNew(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+    : Super(ObjectInitializer)
 {
-	SupportedClass = UGeotiffHeightmapAsset::StaticClass();
-	bCreateNew = true;
-	bEditAfterNew = true;
+    SupportedClass = UGeotiffHeightmapAsset::StaticClass();
+    bCreateNew = true;
+    bEditAfterNew = true;
     Formats.Add(TEXT("tif;Geotiff Heightmap File"));
 }
 
 UObject* UGeotiffHeightmapAssetFactoryNew::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	return NewObject<UGeotiffHeightmapAsset>(InParent, InClass, InName, Flags);
+    return NewObject<UGeotiffHeightmapAsset>(InParent, InClass, InName, Flags);
 }
 
 
 bool UGeotiffHeightmapAssetFactoryNew::ShouldShowInNewMenu() const
 {
-	return true;
+    return true;
 }

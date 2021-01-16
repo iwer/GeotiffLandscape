@@ -28,7 +28,7 @@ enum ES2GLCClasses {
 
 USTRUCT(BlueprintType)
 struct FS2GLCColors {
-	GENERATED_BODY()
-		static constexpr int ClassCount = 15;
-		static constexpr int TifCol[] = {0,62,73,75,82,83,102,103,104,105,106,121,123,162,255};
+    GENERATED_BODY()
+        static constexpr int ClassCount = 15;
+        static constexpr int TifCol[] = {0,62,73,75,82,83,102,103,104,105,106,121,123,162,255};
 };

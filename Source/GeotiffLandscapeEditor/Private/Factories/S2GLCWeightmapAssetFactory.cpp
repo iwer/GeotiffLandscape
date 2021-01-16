@@ -6,18 +6,18 @@
 #include "Engine/Texture2D.h"
 
 US2GLCWeightmapAssetFactory::US2GLCWeightmapAssetFactory( const FObjectInitializer& ObjectInitializer )
-	: Super(ObjectInitializer)
+    : Super(ObjectInitializer)
 {
-	SupportedClass = US2GLCWeightmapAsset::StaticClass();
-	bCreateNew = false;
-	bEditorImport = true;
+    SupportedClass = US2GLCWeightmapAsset::StaticClass();
+    bCreateNew = false;
+    bEditorImport = true;
     Formats.Add(TEXT("s2glc;S2GLC Weightmap File"));
 }
 
 
 UObject* US2GLCWeightmapAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
-	US2GLCWeightmapAsset* Asset = NewObject<US2GLCWeightmapAsset>(InParent, InClass, InName, Flags);
+    US2GLCWeightmapAsset* Asset = NewObject<US2GLCWeightmapAsset>(InParent, InClass, InName, Flags);
 
 
     // open file
@@ -27,8 +27,8 @@ UObject* US2GLCWeightmapAssetFactory::FactoryCreateFile(UClass* InClass, UObject
         return nullptr;
     }
 
-	Asset->ROI = NewObject<URegionOfInterest>(Asset);
-	Asset->ROI->InitFromGDAL(gdaldata);
+    Asset->ROI = NewObject<URegionOfInterest>(Asset);
+    Asset->ROI->InitFromGDAL(gdaldata);
 
     int texsize = 2048;
     TArray<uint8> targetPixels;
@@ -52,10 +52,10 @@ UObject* US2GLCWeightmapAssetFactory::FactoryCreateFile(UClass* InClass, UObject
         Asset->LayerMaps.Add(target);
     }
 
-	bOutOperationCanceled = false;
+    bOutOperationCanceled = false;
 
 
-	return Asset;
+    return Asset;
 }
 
 bool US2GLCWeightmapAssetFactory::FactoryCanImport(const FString & Filename)

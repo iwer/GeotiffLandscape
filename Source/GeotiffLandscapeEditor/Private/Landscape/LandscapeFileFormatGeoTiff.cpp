@@ -36,33 +36,26 @@ FLandscapeHeightmapInfo FLandscapeHeightmapFileFormat_Geotiff::Validate(const TC
             Result.ResultCode = ELandscapeImportResult::Error;
         } else {
             if((strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Int16", 6) != 0) &&
-				(strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Float32", 8) != 0)) {
+                (strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Float32", 8) != 0)) {
                 // neither 16 bit int nor 32 bit float
                 Result.ErrorMessage = LOCTEXT("FileFormatGeotiff_BitDepthError","Pixelformat is not 'Int16' or 'Float32'!");
                 Result.ResultCode = ELandscapeImportResult::Error;
             } else {
                 auto srs = gdaldata->GetProjectionRef();
-                if(!FGeoReferenceHelper::IsWGS84(OSRNewSpatialReference(srs)) &&
-                   !FGeoReferenceHelper::IsUTM(OSRNewSpatialReference(srs))) {
-                    // not in wgs 84 or utm coordinate system
-                    Result.ErrorMessage = LOCTEXT("FileFormatGeotiff_SpatialReferenceError","Spatial Reference not supported!");
-                    Result.ResultCode = ELandscapeImportResult::Error;
-                } else {
-                    double width, height;
-                    URegionOfInterest::GetSize(gdaldata, width, height);
-                    FLandscapeFileResolution ImportResolution;
-                    ImportResolution.Width = width;
-                    ImportResolution.Height = height;
+                double width, height;
+                URegionOfInterest::GetSize(gdaldata, width, height);
+                FLandscapeFileResolution ImportResolution;
+                ImportResolution.Width = width;
+                ImportResolution.Height = height;
 
-                    auto HeightMinMax = GDALHelpers::ComputeRasterMinMax(gdaldata, 1);
-                    // auto PredMapSize = PredictLandscapeSize(width, height);
-                    Result.DataScale = FVector(100, //* width / PredMapSize.X,  // This scales the landscape to the correct size,
-                                               100, //* height / PredMapSize.Y, // but also affect the mapping of the heightvalues to the landscape
-                                               100.0/128 * UGeotiffRasterScaler::HeightScaleFactor(HeightMinMax->Max, HeightMinMax->Min));
-                    Result.PossibleResolutions.Add(ImportResolution);
-                    Result.ErrorMessage = LOCTEXT("FileFormatGeotiff_ValidateSuccess","File validated");
-                    Result.ResultCode = ELandscapeImportResult::Success;
-                }
+                auto HeightMinMax = GDALHelpers::ComputeRasterMinMax(gdaldata, 1);
+                // auto PredMapSize = PredictLandscapeSize(width, height);
+                Result.DataScale = FVector(100, //* width / PredMapSize.X,  // This scales the landscape to the correct size,
+                                            100, //* height / PredMapSize.Y, // but also affect the mapping of the heightvalues to the landscape
+                                            100.0/128 * UGeotiffRasterScaler::HeightScaleFactor(HeightMinMax->Max, HeightMinMax->Min));
+                Result.PossibleResolutions.Add(ImportResolution);
+                Result.ErrorMessage = LOCTEXT("FileFormatGeotiff_ValidateSuccess","File validated");
+                Result.ResultCode = ELandscapeImportResult::Success;
             }
         }
     }
@@ -100,14 +93,14 @@ FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(cons
                 Result.Data.Empty(ExpectedResolution.Width * ExpectedResolution.Height);
                 Result.Data.AddUninitialized(ExpectedResolution.Width * ExpectedResolution.Height);
                 FMemory::Memcpy(Result.Data.GetData(), TempData.GetData(), ExpectedResolution.Width * ExpectedResolution.Height * 2);
-			}
-			else if (strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Float32", 8) == 0) {
-				double heightscale;
-				UGeotiffRasterScaler::ConvertScaleGeotiffRaster<float>(EPixelScanMode::F32_RG8, gdaldata, 1, TempData, ExpectedResolution.Width, ExpectedResolution.Height, heightscale);
-				Result.Data.Empty(ExpectedResolution.Width * ExpectedResolution.Height);
-				Result.Data.AddUninitialized(ExpectedResolution.Width * ExpectedResolution.Height);
-				FMemory::Memcpy(Result.Data.GetData(), TempData.GetData(), ExpectedResolution.Width * ExpectedResolution.Height * 2);
-			}
+            }
+            else if (strncmp(GDALGetDataTypeName(rasterBands[0]->GetRasterDataType()), "Float32", 8) == 0) {
+                double heightscale;
+                UGeotiffRasterScaler::ConvertScaleGeotiffRaster<float>(EPixelScanMode::F32_RG8, gdaldata, 1, TempData, ExpectedResolution.Width, ExpectedResolution.Height, heightscale);
+                Result.Data.Empty(ExpectedResolution.Width * ExpectedResolution.Height);
+                Result.Data.AddUninitialized(ExpectedResolution.Width * ExpectedResolution.Height);
+                FMemory::Memcpy(Result.Data.GetData(), TempData.GetData(), ExpectedResolution.Width * ExpectedResolution.Height * 2);
+            }
         }
     }
     return Result;
