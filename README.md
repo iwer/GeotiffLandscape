@@ -115,3 +115,6 @@ Geotiff heightmap assets contain the geo information and a texture2D where the 1
 
 ### S2GLC Weightmap DataAsset
 S2GLC DataAssets contain a texture for each of the 15 layers (*except NoData and Clouds*) and the geo reference information.
+
+## Funding
+Development of this code was partially funded by the German Federal Ministry of Education and Research (BMBF) under funding reference number 13FH1I01IA.
