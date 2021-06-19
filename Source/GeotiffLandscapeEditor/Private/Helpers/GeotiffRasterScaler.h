@@ -156,9 +156,11 @@ private:
                     targetPixels.Add(igray);
                 } else if (psm == EPixelScanMode::G16_RG8 || psm == EPixelScanMode::F32_RG8){
                     float gray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
+                    
                     // scale to min height and max height
-                    uint16 igray = (gray - rasterMinMax->Min) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
-
+                    //uint16 igray = (gray - rasterMinMax->Min) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
+                    uint16 igray = (gray + 327.67) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
+                    
                     // split to two 8bits
                     uint8 gright = igray & 0xff;
                     uint8 gleft = (igray >> 8);
