@@ -12,9 +12,9 @@ class UGeotiffColorHelper
 {
     GENERATED_BODY()
 public:
-    static bool VerifyS2GLCColors(GDALDatasetRef &dataset) {
-        auto rasterdata = mergetiff::DatasetManagement::rasterFromDataset<uint8_t>(dataset, { static_cast<unsigned int>(1) });
-        auto rasterBands = mergetiff::DatasetManagement::getRasterBands(dataset, { 1 });
+    static bool VerifyS2GLCColors(GDALDatasetRef &Dataset) {
+        auto RasterData = mergetiff::DatasetManagement::rasterFromDataset<uint8_t>(Dataset, { static_cast<unsigned int>(1) });
+        const auto RasterBands = mergetiff::DatasetManagement::getRasterBands(Dataset, { 1 });
 
         // Make Set os S2GLC colors
         TSet<uint8_t> S2GLCColors;
@@ -28,20 +28,20 @@ public:
         UE_LOG(LogTemp, Warning, TEXT("S2GLCColors Num: %d"), S2GLCColors.Num());
 
         // collect unique pixel values in dataset
-        TSet<uint8_t> pixelValues;
-        pixelValues.Empty();
-        for (int y = 0; y < rasterBands[0]->GetYSize(); y++) {
-            for (int x = 0; x < rasterBands[0]->GetXSize(); x++) {
-                auto pixel = rasterdata.pixelComponent(y, x, 0);
+        TSet<uint8_t> PixelValues;
+        PixelValues.Empty();
+        for (int y = 0; y < RasterBands[0]->GetYSize(); y++) {
+            for (int x = 0; x < RasterBands[0]->GetXSize(); x++) {
+                auto Pixel = RasterData.pixelComponent(y, x, 0);
                 //UE_LOG(LogTemp, Warning, TEXT("Pixel: %d"), pixel);
-                pixelValues.Add(pixel);
-                if(!S2GLCColors.Contains(pixel))
-                    UE_LOG(LogTemp, Warning, TEXT("Pixel: %d %dx%d"), pixel, x, y);
+                PixelValues.Add(Pixel);
+                if(!S2GLCColors.Contains(Pixel))
+                    UE_LOG(LogTemp, Warning, TEXT("Pixel: %d %dx%d"), Pixel, x, y);
             }
         }
-        UE_LOG(LogTemp, Warning, TEXT("pixelValues Num: %d"), pixelValues.Num());
+        UE_LOG(LogTemp, Warning, TEXT("pixelValues Num: %d"), PixelValues.Num());
 
-        if (S2GLCColors.Includes(pixelValues))
+        if (S2GLCColors.Includes(PixelValues))
             return true;
 
         return false;

@@ -25,5 +25,5 @@ public:
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="GeotiffHeightmapAsset")
     UTexture2D * Texture;
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GeotiffHeightmapAsset")
-    URegionOfInterest * ROI;
+    URegionOfInterest * Roi;
 };

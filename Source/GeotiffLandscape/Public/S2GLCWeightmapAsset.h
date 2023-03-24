@@ -23,5 +23,6 @@ public:
     TArray<UTexture2D*> LayerMaps;
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "S2GLCWeightmapAsset")
-    URegionOfInterest * ROI;
+    URegionOfInterest * RegionOfInterest
+    ;
 };

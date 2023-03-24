@@ -23,38 +23,38 @@ class UGeotiffRasterScaler
 {
     GENERATED_BODY()
 public:
-    constexpr static double UE4LANDSCAPE_HEIGHTLIMIT = 655.33;
+    constexpr static double UE4LANDSCAPE_HEIGHT_LIMIT = 655.33;
     template  <typename PixelType>
-    static void ConvertScaleGeotiffRaster(EPixelScanMode psm,
-                                          GDALDatasetRef &source,
-                                          int bandIndex,
-                                          TArray<uint8> &targetPixels,
-                                          int targetWidth,
-                                          int targetHeight,
+    static void ConvertScaleGeotiffRaster(const EPixelScanMode Psm,
+                                          GDALDatasetRef &Source,
+                                          const int BandIndex,
+                                          TArray<uint8> &TargetPixels,
+                                          const int TargetWidth,
+                                          const int TargetHeight,
                                           double &ScaleSuggestion)
     {
-        targetPixels.Empty();
-        TargetToSourceScaling<PixelType>(psm, source, bandIndex, -1, targetPixels, targetWidth, targetHeight, ScaleSuggestion);
+        TargetPixels.Empty();
+        TargetToSourceScaling<PixelType>(Psm, Source, BandIndex, -1, TargetPixels, TargetWidth, TargetHeight, ScaleSuggestion);
     }
 
-    static bool ImportScaleGeotiffWeightLayer(GDALDatasetRef &source,
-                                              int bandIndex,
-                                              FName LayerName,
-                                              TArray<uint8> &targetPixels,
-                                              int targetWidth,
-                                              int targetHeight)
+    static bool ImportScaleGeotiffWeightLayer(GDALDatasetRef &Source,
+                                              const int BandIndex,
+                                              const FName LayerName,
+                                              TArray<uint8> &TargetPixels,
+                                              const int TargetWidth,
+                                              const int TargetHeight)
     {
-        const UEnum* classenum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ES2GLCClasses"), true);
-        if (classenum) {
-            int32 Index = classenum->GetIndexByName(LayerName);
+        const UEnum* ClassEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ES2GLCClasses"), true);
+        if (ClassEnum) {
+            const int32 Index = ClassEnum->GetIndexByName(LayerName);
             if(Index != INDEX_NONE) {
-                uint8 layer_tifcolor = FS2GLCColors::TifCol[Index];
-                UE_LOG(LogTemp,Warning,TEXT("Tif value for layer %s is %d"), *LayerName.ToString(), layer_tifcolor);
+                const uint8 Layer_TifColor = FS2GLCColors::TifCol[Index];
+                UE_LOG(LogTemp,Warning,TEXT("Tif value for layer %s is %d"), *LayerName.ToString(), Layer_TifColor);
                 // go on scanning
-                targetPixels.Empty();
+                TargetPixels.Empty();
 
                 double ScaleSuggestion;
-                TargetToSourceScaling<uint8_t>(EPixelScanMode::G8_ValueMask8, source, bandIndex, layer_tifcolor, targetPixels, targetWidth, targetHeight, ScaleSuggestion);
+                TargetToSourceScaling<uint8_t>(EPixelScanMode::G8_ValueMask8, Source, BandIndex, Layer_TifColor, TargetPixels, TargetWidth, TargetHeight, ScaleSuggestion);
             } else {
                 UE_LOG(LogTemp,Warning,TEXT("Unknown Layername: %s"), *LayerName.ToString());
                 return false;
@@ -66,66 +66,63 @@ public:
         return true;
     }
 
-    static double HeightScaleFactor(double maxHeight, double minHeight)
+    static double HeightScaleFactor(const double MaxHeight, const double MinHeight)
     {
         // check if height difference is bigger than UE4 landscape height limit
-        double heightdiff = maxHeight - minHeight;
-        if(heightdiff > UE4LANDSCAPE_HEIGHTLIMIT) {
-            return heightdiff / UE4LANDSCAPE_HEIGHTLIMIT;
+        const double HeightDiff = MaxHeight - MinHeight;
+        if(HeightDiff > UE4LANDSCAPE_HEIGHT_LIMIT) {
+            return HeightDiff / UE4LANDSCAPE_HEIGHT_LIMIT;
         } else {
             return 1.0;
         }
     }
 
 private:
-    static float BilinearInterpolation(float A,
-                                       float B,
-                                       float C,
-                                       float D,
-                                       float xdiff,
-                                       float ydiff)
+    static float BilinearInterpolation(const float A,
+                                       const float B,
+                                       const float C,
+                                       const float D,
+                                       const float XDiff,
+                                       const float YDiff)
     {
-        return (A * (1 - xdiff) * (1 - ydiff) +  B * (xdiff) * (1 - ydiff) +
-                C * (ydiff)     * (1 - xdiff) +  D * (xdiff  * ydiff));
+        return (A * (1 - XDiff) * (1 - YDiff) +  B * (XDiff) * (1 - YDiff) +
+                C * (YDiff)     * (1 - XDiff) +  D * (XDiff  * YDiff));
     }
 
     template  <typename PixelType>
-    static void TargetToSourceScaling(EPixelScanMode psm,
-                                      GDALDatasetRef &source,
-                                      int bandIndex,
-                                      int16 S2GLCLayer,
-                                      TArray<uint8> &targetPixels,
-                                      int targetWidth,
-                                      int targetHeight,
+    static void TargetToSourceScaling(const EPixelScanMode Psm,
+                                      GDALDatasetRef &Source,
+                                      const int BandIndex,
+                                      const int16 S2GlcLayer,
+                                      TArray<uint8> &TargetPixels,
+                                      const int TargetWidth,
+                                      const int TargetHeight,
                                       double &ScaleSuggestion)
     {
         // determine min and max height
-        RasterMinMaxRef rasterMinMax = GDALHelpers::ComputeRasterMinMax(source, bandIndex);
+        const RasterMinMaxRef RasterMinMax = GDALHelpers::ComputeRasterMinMax(Source, BandIndex);
 
-        ScaleSuggestion = HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
+        ScaleSuggestion = HeightScaleFactor(RasterMinMax->Max, RasterMinMax->Min);
 
-        UE_LOG(LogTemp,Warning,TEXT("ScaleSuggestion: %f, min: %f, max: %f"), ScaleSuggestion, rasterMinMax->Min, rasterMinMax->Max);
+        UE_LOG(LogTemp,Warning,TEXT("ScaleSuggestion: %f, min: %f, max: %f"), ScaleSuggestion, RasterMinMax->Min, RasterMinMax->Max);
 
-        auto rasterdata = mergetiff::DatasetManagement::rasterFromDataset<PixelType>(source,{static_cast<unsigned int>(bandIndex)});
+        auto RasterData = mergetiff::DatasetManagement::rasterFromDataset<PixelType>(Source,{static_cast<unsigned int>(BandIndex)});
 
-        float xRatio = ((float)rasterdata.cols()-1)/((float)targetWidth);
-        float yRatio = ((float)rasterdata.rows()-1)/((float)targetHeight);
+        float XRatio = (static_cast<float>(RasterData.cols())-1)/static_cast<float>(TargetWidth);
+        float YRatio = (static_cast<float>(RasterData.rows())-1)/static_cast<float>(TargetHeight);
 
-        UE_LOG(LogTemp, Warning, TEXT("Rasterdata has %d channels, %dx%d -> %fx%f"), rasterdata.channels(),rasterdata.cols(), rasterdata.rows(), xRatio, yRatio);
+        UE_LOG(LogTemp, Warning, TEXT("Rasterdata has %d channels, %dx%d -> %fx%f"), RasterData.channels(),RasterData.cols(), RasterData.rows(), XRatio, YRatio);
 
-        for(size_t targetY = 0; targetY < targetHeight; targetY++){
+        for(size_t TargetY = 0; TargetY < TargetHeight; TargetY++){
             // calculate source y
-            int source_y = (int)(yRatio * targetY);
+            int Source_Y = static_cast<int>(YRatio * TargetY);
             // partial y-pixel for interpolation
-            float y_diff = (yRatio * targetY) - source_y;
-            for(size_t targetX = 0; targetX < targetWidth; targetX++){
+            const float Y_Diff = (YRatio * TargetY) - Source_Y;
+            for(size_t TargetX = 0; TargetX < TargetWidth; TargetX++){
                 //calculate source x
-                int source_x = (int)(xRatio * targetX);
+                int Source_X = static_cast<int>(XRatio * TargetX);
                 // partial x pixel for interpolation
-                float x_diff = (xRatio * targetX) - source_x;
-
-                // pixel index in continous array
-                int pix_idx = source_y * rasterdata.cols() + source_x;
+                const float X_Diff = (XRatio * TargetX) - Source_X;
 
                 // get pixels
                 //     | x | x+1 |
@@ -134,73 +131,71 @@ private:
                 //----------------
                 // y+1 | C | D   |
                 //----------------
-                float A = rasterdata.pixelComponent(source_y,   source_x  , 0);
-                float B = rasterdata.pixelComponent(source_y,   source_x+1, 0);
-                float C = rasterdata.pixelComponent(source_y+1, source_x  , 0);
-                float D = rasterdata.pixelComponent(source_y+1, source_x+1, 0);
+                float A = RasterData.pixelComponent(Source_Y,   Source_X  , 0);
+                float B = RasterData.pixelComponent(Source_Y,   Source_X+1, 0);
+                float C = RasterData.pixelComponent(Source_Y+1, Source_X  , 0);
+                float D = RasterData.pixelComponent(Source_Y+1, Source_X+1, 0);
 
 
                 // when scanning for a selective value, put 8 bit into buffer
                 // when scanning heightmaps use two bytes as 16 bit
-                if(psm == EPixelScanMode::G8_ValueMask8 && S2GLCLayer != -1){
+                if(Psm == EPixelScanMode::G8_ValueMask8 && S2GlcLayer != -1){
                     // color pixel white when it has Layer color, black otherwise
-                    A = LayerOnPixel(S2GLCLayer, A);
-                    B = LayerOnPixel(S2GLCLayer, B);
-                    C = LayerOnPixel(S2GLCLayer, C);
-                    D = LayerOnPixel(S2GLCLayer, D);
-                    uint8 igray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
-                    targetPixels.Add(igray);
-                } else if (psm == EPixelScanMode::G8_G8){
+                    A = LayerOnPixel(S2GlcLayer, A);
+                    B = LayerOnPixel(S2GlcLayer, B);
+                    C = LayerOnPixel(S2GlcLayer, C);
+                    D = LayerOnPixel(S2GlcLayer, D);
+                    uint8 IGray = BilinearInterpolation(A,B,C,D,X_Diff,Y_Diff);
+                    TargetPixels.Add(IGray);
+                } else if (Psm == EPixelScanMode::G8_G8){
                     //float gray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
-                    uint8 igray = A;
-                    targetPixels.Add(igray);
-                } else if (psm == EPixelScanMode::G16_RG8 || psm == EPixelScanMode::F32_RG8){
-                    float gray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
+                    uint8 IGray = A;
+                    TargetPixels.Add(IGray);
+                } else if (Psm == EPixelScanMode::G16_RG8 || Psm == EPixelScanMode::F32_RG8){
+                    const float Gray = BilinearInterpolation(A,B,C,D,X_Diff,Y_Diff);
                     
                     // scale to min height and max height
-                    //uint16 igray = (gray - rasterMinMax->Min) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
-                    uint16 igray = (gray + 327.67) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
+                    uint16 IGray = (Gray + 327.67) * 100 / HeightScaleFactor(RasterMinMax->Max, RasterMinMax->Min);
                     
                     // split to two 8bits
-                    uint8 gright = igray & 0xff;
-                    uint8 gleft = (igray >> 8);
+                    uint8 GRight = IGray & 0xff;
+                    uint8 GLeft = (IGray >> 8);
 
-                    targetPixels.Add(gright);
-                    targetPixels.Add(gleft);
-                } else if (psm == EPixelScanMode::G8_BGRA8) {
-                    float gray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
-                    uint8 igray = gray;
-                    targetPixels.Add(igray);
-                    targetPixels.Add(igray);
-                    targetPixels.Add(igray);
-                    targetPixels.Add(igray);
-                } else if (psm == EPixelScanMode::G16_BGRA8) {
-                    float gray = BilinearInterpolation(A,B,C,D,x_diff,y_diff);
+                    TargetPixels.Add(GRight);
+                    TargetPixels.Add(GLeft);
+                } else if (Psm == EPixelScanMode::G8_BGRA8) {
+                    const float Gray = BilinearInterpolation(A,B,C,D,X_Diff,Y_Diff);
+                    uint8 IGray = Gray;
+                    TargetPixels.Add(IGray);
+                    TargetPixels.Add(IGray);
+                    TargetPixels.Add(IGray);
+                    TargetPixels.Add(IGray);
+                } else if (Psm == EPixelScanMode::G16_BGRA8) {
+                    const float Gray = BilinearInterpolation(A,B,C,D,X_Diff,Y_Diff);
                     // scale to min height and max height
-                    //uint16 igray = (gray - rasterMinMax->Min) * 100 / HeightScaleFactor(rasterMinMax->Max, rasterMinMax->Min);
-                    uint16 igray = (gray - rasterMinMax->Min)  / (rasterMinMax->Max - rasterMinMax->Min) * 65535;
+                    uint16 IGray = (Gray - RasterMinMax->Min)  / (RasterMinMax->Max - RasterMinMax->Min) * 65535;
 
                     // split to two 8bits
-                    uint8 gright = igray & 0xff;
-                    uint8 gleft = (igray >> 8);
+                    uint8 GRight = IGray & 0xff;
+                    uint8 GLeft = (IGray >> 8);
 
-                    targetPixels.Add(0);
-                    targetPixels.Add(gright);
-                    targetPixels.Add(gleft);
-                    targetPixels.Add(255);
-                } else if (psm == EPixelScanMode::F32_BGRA8) {
-                    float gray = BilinearInterpolation(A, B, C, D, x_diff, y_diff);
+                    TargetPixels.Add(0);
+                    TargetPixels.Add(GRight);
+                    TargetPixels.Add(GLeft);
+                    TargetPixels.Add(255);
+                } else if (Psm == EPixelScanMode::F32_BGRA8) {
+                    const float Gray = BilinearInterpolation(A, B, C, D, X_Diff, Y_Diff);
                     // scale to min height and max height
-                    uint16 igray = (gray - rasterMinMax->Min) / (rasterMinMax->Max - rasterMinMax->Min) * 65535;
+                    uint16 IGray = (Gray - RasterMinMax->Min) / (RasterMinMax->Max - RasterMinMax->Min) * 65535;
 
                     // split to two 8bits
-                    uint8 gright = igray & 0xff;
-                    uint8 gleft = (igray >> 8);
+                    uint8 GRight = IGray & 0xff;
+                    uint8 GLeft = (IGray >> 8);
 
-                    targetPixels.Add(0);
-                    targetPixels.Add(gright);
-                    targetPixels.Add(gleft);
-                    targetPixels.Add(255);
+                    TargetPixels.Add(0);
+                    TargetPixels.Add(GRight);
+                    TargetPixels.Add(GLeft);
+                    TargetPixels.Add(255);
                 }
             }
         }
@@ -208,9 +203,9 @@ private:
 
     static uint8 LayerOnPixel(int16 S2GLCLayer, float Pixel)
     {
-        if(uint8(Pixel) == S2GLCLayer) {
+        if(static_cast<uint8>(Pixel) == S2GLCLayer) {
             return 255;
-        } else if(S2GLCLayer == 123 && uint8(Pixel) == 0) { // interpret clouds as snow for now
+        } else if(S2GLCLayer == 123 && static_cast<uint8>(Pixel) == 0) { // interpret clouds as snow for now
             return 255;
         } else {
             return 0;

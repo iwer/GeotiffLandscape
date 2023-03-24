@@ -21,23 +21,23 @@ UObject* US2GLCWeightmapAssetFactory::FactoryCreateFile(UClass* InClass, UObject
 
 
     // open file
-    GDALDatasetRef gdaldata = GDALHelpers::OpenRaster(Filename, true);
-    if(!gdaldata){
+    GDALDatasetRef GdalData = GDALHelpers::OpenRaster(Filename, true);
+    if(!GdalData){
         bOutOperationCanceled = true;
         return nullptr;
     }
 
-    Asset->ROI = NewObject<URegionOfInterest>(Asset);
-    Asset->ROI->InitFromGDAL(gdaldata);
+    Asset->RegionOfInterest = NewObject<URegionOfInterest>(Asset);
+    Asset->RegionOfInterest->InitFromGDAL(GdalData);
 
-    int texsize = 2048;
-    TArray<uint8> targetPixels;
-    FString TextureName = TEXT("T_") + InName.ToString();
+    const FString TextureName = TEXT("T_") + InName.ToString();
 
-    const UEnum* classenum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ES2GLCClasses"), true);
+    const UEnum* ClassEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ES2GLCClasses"), true);
 
     // only to NumEnums - 1 because enums contain an extra ENUMNAME_MAX value
-    for(int i = 0; i < classenum->NumEnums()-1;i++){
+    for(int i = 0; i < ClassEnum->NumEnums()-1;i++){
+        constexpr int TexSize = 2048;
+        const TArray<uint8> TargetPixels;
         if(i == ES2GLCClasses::Clouds ||
             i == ES2GLCClasses::NoData) {
                 Asset->LayerMaps.Add(nullptr);
@@ -45,11 +45,11 @@ UObject* US2GLCWeightmapAssetFactory::FactoryCreateFile(UClass* InClass, UObject
         }
 
         // create texture with name
-        FName LayerName = classenum->GetNameByIndex(i);
+        FName LayerName = ClassEnum->GetNameByIndex(i);
         FString Name = TextureName + TEXT("_") + LayerName.ToString();
-        UTexture2D * target = NewObject<UTexture2D>(Asset, *Name, RF_Public | RF_Standalone | RF_MarkAsRootSet);
-        ExtractLayerMap(gdaldata, target, LayerName, targetPixels, texsize, texsize);
-        Asset->LayerMaps.Add(target);
+        UTexture2D * Target = NewObject<UTexture2D>(Asset, *Name, RF_Public | RF_Standalone | RF_MarkAsRootSet);
+        ExtractLayerMap(GdalData, Target, LayerName, TargetPixels, TexSize, TexSize);
+        Asset->LayerMaps.Add(Target);
     }
 
     bOutOperationCanceled = false;
@@ -69,7 +69,7 @@ bool US2GLCWeightmapAssetFactory::FactoryCanImport(const FString & Filename)
     return false;
 }
 
-void US2GLCWeightmapAssetFactory::ExtractLayerMap(GDALDatasetRef &Source, UTexture2D * TargetTexture, FName LayerName, TArray<uint8> Pixels, int Width, int Height)
+void US2GLCWeightmapAssetFactory::ExtractLayerMap(GDALDatasetRef &Source, UTexture2D * TargetTexture, const FName LayerName, TArray<uint8> Pixels, const int Width, const int Height) const
 {
     // Populate texture
     TargetTexture->AddToRoot();
@@ -85,7 +85,7 @@ void US2GLCWeightmapAssetFactory::ExtractLayerMap(GDALDatasetRef &Source, UTextu
     Mip->SizeX = Width;
     Mip->SizeY = Height;
     Mip->BulkData.Lock(LOCK_READ_WRITE);
-    uint8* TextureData = (uint8*)Mip->BulkData.Realloc(sizeof(uint8) * Width * Height);
+    uint8* TextureData = static_cast<uint8*>(Mip->BulkData.Realloc(sizeof(uint8) * Width * Height));
     FMemory::Memcpy(TextureData, Pixels.GetData(), sizeof(uint8) * Width * Height);
     Mip->BulkData.Unlock();
 
