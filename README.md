@@ -1,6 +1,6 @@
-GeotiffLandscape - UE4 Plugin
-==============================
-Adds geotiff files as UE4 Landscape height/weight map file type and custom data asset type. This can be used to generate real scale UE4 maps from existing locations. Geotiff digital elevation models (DEM) contain information about geo coordinates of the map and information about maximum and minimum elevation. With this information 1:1 scale Landscapes can be created using this Plugin. Also geotiff land cover files from the [S2GLC](http://s2glc.cbk.waw.pl/) can be imported to named landscape layers.
+# GeotiffLandscape - Unreal Engine Plugin
+
+Adds geotiff files as Unreal Landscape height/weight map file type and custom data asset type. This can be used to generate real scale maps from existing locations. Geotiff digital elevation models (DEM) contain information about geo coordinates of the map and information about maximum and minimum elevation. With this information 1:1 scale Landscapes can be created using this Plugin. Also geotiff land cover files from the [S2GLC](http://s2glc.cbk.waw.pl/) can be imported to named landscape layers.
 
 
 
@@ -17,6 +17,10 @@ Adds geotiff files as UE4 Landscape height/weight map file type and custom data 
     - [Geotiff Heightmap DataAsset](#geotiff-heightmap-dataasset)
     - [S2GLC Weightmap DataAsset](#s2glc-weightmap-dataasset)
 
+## Compatibility
+
+* Unreal Engine 4 is supported at least with 4.27 (branch ue4, tag ue4.27)
+* Unreal Engine 5 is supported up to 5.1 (on master branch)
 
 ## Features
 * Landscape Heightmap Fileformat Geotiff
