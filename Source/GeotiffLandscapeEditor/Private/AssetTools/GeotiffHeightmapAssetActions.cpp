@@ -39,7 +39,7 @@ void FGeotiffHeightmapAssetActions::GetActions(const TArray<UObject*>& InObjects
 
 uint32 FGeotiffHeightmapAssetActions::GetCategories()
 {
-    return EAssetTypeCategories::MaterialsAndTextures;
+    return EAssetTypeCategories::Textures;
 }
 
 

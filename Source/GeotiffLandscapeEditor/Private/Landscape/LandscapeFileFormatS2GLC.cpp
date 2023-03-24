@@ -28,6 +28,7 @@ FLandscapeWeightmapInfo FLandscapeWeightmapFileFormat_S2GLC::Validate(const TCHA
     if (ClassEnum) {
         const int32 Index = ClassEnum->GetIndexByName(LayerName);
         if(Index == INDEX_NONE) {
+            UE_LOG(LogTemp,Warning,TEXT("Importing Layer %s, S2GLCIndex %d"), *LayerName.ToString(), Index);
             Result.ErrorMessage = LOCTEXT("FileFormatS2GLC_LayerNameError","LayerName is not a valid S2GLC class!");
             Result.ResultCode = ELandscapeImportResult::Error;
         } else {
@@ -127,7 +128,7 @@ FLandscapeWeightmapImportData FLandscapeWeightmapFileFormat_S2GLC::Import(const 
     return Result;
 }
 
-void FLandscapeWeightmapFileFormat_S2GLC::Export(const TCHAR* WeightmapFilename, FName LayerName, TArrayView<const uint8> Data, FLandscapeFileResolution DataResolution) const
+void FLandscapeWeightmapFileFormat_S2GLC::Export(const TCHAR* WeightmapFilename, FName LayerName, TArrayView<const uint8> Data, FLandscapeFileResolution DataResolution, FVector Scale) const
 {
 
 }

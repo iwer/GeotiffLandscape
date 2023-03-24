@@ -73,15 +73,15 @@ void US2GLCWeightmapAssetFactory::ExtractLayerMap(GDALDatasetRef &Source, UTextu
 {
     // Populate texture
     TargetTexture->AddToRoot();
-    TargetTexture->PlatformData = new FTexturePlatformData();
-    TargetTexture->PlatformData->SizeX = Width;
-    TargetTexture->PlatformData->SizeY = Height;
-    TargetTexture->PlatformData->PixelFormat = EPixelFormat::PF_G8;
+    TargetTexture->SetPlatformData(new FTexturePlatformData());
+    TargetTexture->GetPlatformData()->SizeX = Width;
+    TargetTexture->GetPlatformData()->SizeY = Height;
+    TargetTexture->GetPlatformData()->PixelFormat = EPixelFormat::PF_G8;
 
     UGeotiffRasterScaler::ImportScaleGeotiffWeightLayer(Source, 1, LayerName, Pixels, Width, Height);
 
     FTexture2DMipMap* Mip = new FTexture2DMipMap();
-    TargetTexture->PlatformData->Mips.Add(Mip);
+    TargetTexture->GetPlatformData()->Mips.Add(Mip);
     Mip->SizeX = Width;
     Mip->SizeY = Height;
     Mip->BulkData.Lock(LOCK_READ_WRITE);

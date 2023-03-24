@@ -17,7 +17,7 @@ FLandscapeHeightmapFileFormat_Geotiff::FLandscapeHeightmapFileFormat_Geotiff()
     FileTypeInfo.bSupportsExport = false;
 }
 
-FLandscapeHeightmapInfo FLandscapeHeightmapFileFormat_Geotiff::Validate(const TCHAR* HeightmapFilename) const
+FLandscapeHeightmapInfo FLandscapeHeightmapFileFormat_Geotiff::Validate(const TCHAR* HeightmapFilename, FName LayerName) const
 {
     FLandscapeHeightmapInfo Result;
 
@@ -48,8 +48,9 @@ FLandscapeHeightmapInfo FLandscapeHeightmapFileFormat_Geotiff::Validate(const TC
                 FLandscapeFileResolution ImportResolution;
                 ImportResolution.Width = Width;
                 ImportResolution.Height = Height;
-
-                const auto HeightMinMax = GDALHelpers::ComputeRasterMinMax(GdalData, 1);
+                auto HeightMinMax = GDALHelpers::ComputeRasterMinMax(GdalData, 1);
+		if(!HeightMinMax)
+    			UE_LOG(LogTemp,Warning,TEXT("HeightMinMax empty!!!"))
                 // auto PredMapSize = PredictLandscapeSize(width, height);
                 Result.DataScale = FVector(100, //* width / PredMapSize.X,  // This scales the landscape to the correct size,
                                             100, //* height / PredMapSize.Y, // but also affect the mapping of the heightvalues to the landscape
@@ -63,7 +64,7 @@ FLandscapeHeightmapInfo FLandscapeHeightmapFileFormat_Geotiff::Validate(const TC
     return Result;
 }
 
-FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(const TCHAR* HeightmapFilename, FLandscapeFileResolution ExpectedResolution) const
+FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(const TCHAR* HeightmapFilename, FName LayerName, FLandscapeFileResolution ExpectedResolution) const
 {
     FLandscapeHeightmapImportData Result;
 
@@ -107,7 +108,7 @@ FLandscapeHeightmapImportData FLandscapeHeightmapFileFormat_Geotiff::Import(cons
     return Result;
 }
 
-void FLandscapeHeightmapFileFormat_Geotiff::Export(const TCHAR* HeightmapFilename, TArrayView<const uint16> Data, FLandscapeFileResolution DataResolution, FVector Scale) const
+void FLandscapeHeightmapFileFormat_Geotiff::Export(const TCHAR* HeightmapFilename, FName LayerName, TArrayView<const uint16> Data, FLandscapeFileResolution DataResolution, FVector Scale) const
 {
 
 }
@@ -209,7 +210,7 @@ FLandscapeWeightmapImportData FLandscapeWeightmapFileFormat_Geotiff::Import(cons
     return Result;
 }
 
-void FLandscapeWeightmapFileFormat_Geotiff::Export(const TCHAR* WeightmapFilename, FName LayerName, TArrayView<const uint8> Data, FLandscapeFileResolution DataResolution) const
+void FLandscapeWeightmapFileFormat_Geotiff::Export(const TCHAR* WeightmapFilename, FName LayerName, TArrayView<const uint8> Data, FLandscapeFileResolution DataResolution, FVector Scale) const
 {
 
 }

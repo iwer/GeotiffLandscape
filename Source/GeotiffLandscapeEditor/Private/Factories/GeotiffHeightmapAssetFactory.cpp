@@ -48,10 +48,10 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
     // Create texture
     Asset->Texture = NewObject<UTexture2D>(Asset, *TextureName, RF_Public | RF_Standalone | RF_MarkAsRootSet);
     Asset->Texture->AddToRoot();
-    Asset->Texture->PlatformData = new FTexturePlatformData();
-    Asset->Texture->PlatformData->SizeX = TexSize;
-    Asset->Texture->PlatformData->SizeY = TexSize;
-    Asset->Texture->PlatformData->PixelFormat = EPixelFormat::PF_B8G8R8A8;
+    Asset->Texture->SetPlatformData(new FTexturePlatformData());
+    Asset->Texture->GetPlatformData()->SizeX = TexSize;
+    Asset->Texture->GetPlatformData()->SizeY = TexSize;
+    Asset->Texture->GetPlatformData()->PixelFormat = EPixelFormat::PF_B8G8R8A8;
 
     // Pixel Memory
     TArray<uint8> TargetPixels;
@@ -66,7 +66,7 @@ UObject* UGeotiffHeightmapAssetFactory::FactoryCreateFile(UClass* InClass,
     }
 
     FTexture2DMipMap* Mip = new FTexture2DMipMap();
-    Asset->Texture->PlatformData->Mips.Add(Mip);
+    Asset->Texture->GetPlatformData()->Mips.Add(Mip);
     Mip->SizeX = TexSize;
     Mip->SizeY = TexSize;
     Mip->BulkData.Lock(LOCK_READ_WRITE);

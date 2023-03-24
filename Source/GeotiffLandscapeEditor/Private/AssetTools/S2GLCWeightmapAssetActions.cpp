@@ -39,7 +39,7 @@ void FS2GLCWeightmapAssetActions::GetActions(const TArray<UObject*>& InObjects, 
 
 uint32 FS2GLCWeightmapAssetActions::GetCategories()
 {
-    return EAssetTypeCategories::MaterialsAndTextures;
+    return EAssetTypeCategories::Textures;
 }
 
 
